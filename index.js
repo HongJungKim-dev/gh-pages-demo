@@ -7,6 +7,7 @@ app.use(express.json());
 
 app.get('/', async (req, res, next) => {
   res.writeHead('200', { 'Content-Type': 'text/html;charset=utf-8' });
+  console.log('서버 응답');
   res.end('<h1>서버에서 응답한 결과입니다</h1>');
 });
 
@@ -19,6 +20,19 @@ app.get('/read', async (req, res, next) => {
 const users = [];
 const room = [];
 const arr = [];
+
+app.post('/', async (req, res, next) => {
+    const { title, code, host } = req.body;
+    const isHost = true;
+    const roomInfo = { title, code, host };
+    room.push(roomInfo);
+  
+    console.log("room : "+room.title);
+    res.status(200).json({
+      message: 'WeTube room create success!!!',
+      result: room,
+    });
+  });
 
 app.post('/create', async (req, res, next) => {
   const { data } = req.body;
@@ -58,12 +72,14 @@ app.get('/room', async (req, res) => {
 });
 
 app.post('/room', async (req, res) => {
-  const { roomInfo } = req.body;
+  const { title, code, host } = req.body;
+  const isHost = true;
+  const roomInfo = { title, code, host, isHost};
 
   room.push(roomInfo);
 
   res.status(200).json({
-    message: 'WeTube room create success',
+    message: 'WeTube room create success now',
     result: room,
   });
 });
