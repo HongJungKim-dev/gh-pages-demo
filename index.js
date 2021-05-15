@@ -20,6 +20,7 @@ app.get('/read', async (req, res, next) => {
 const users = [];
 const room = [];
 const arr = [];
+let i = 0;
 
 app.post('/', async (req, res, next) => {
     const { title, code, host } = req.body;
@@ -67,7 +68,8 @@ app.post('/user', async (req, res) => {
 app.get('/room', async (req, res) => {
   res.status(200).json({
     message: 'get users data success',
-    result: room,
+    title: room[0].title,
+    host: room[0].host,
   });
 });
 
