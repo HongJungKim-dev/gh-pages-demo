@@ -88,6 +88,55 @@ app.post('/room', async (req, res) => {
 
 app.set('port', process.env.PORT || 3000);
 
-http.createServer(app).listen(app.get('port'), () => {
+const server = http.createServer(app);
+
+// http Server를 socket.io 서버로 업그레이드
+io.sockets.on('connection', (socket) => {
+  console.log(`socket ${socket.id} connected: `)
+
+  socket.on('enter', (data) => {
+    const roomData = JSON.parse(data)
+    const user_name = roomData.user_name
+    const room_code = roomData.room_code
+
+    socket.join(`${room_code}`)
+    
+    console.log(`${user_name} entered room:${room_code}`)
+    
+    const enterData = {
+      type : "ENTER",
+      content : `${user_name}님이 입장하셨습니다.`  
+    }
+    socket.broadcast.to(`${room_code}`).emit('update', JSON.stringify(enterData))
+  })
+
+  socket.on('exit', (data) => {
+    const roomData = JSON.parse(data)
+    const user_name = roomData.user_name
+    const room_code = roomData.room_code
+
+    socket.leave(`${room_code}`)
+
+    console.log(`${user_name} exits room:${room_code}`)
+
+    const exitData = {
+      type : "EXIT",
+      content : `${user_name}님이 퇴장하셨습니다.`  
+    }
+    socket.broadcast.to(`${room_code}`).emit('update', JSON.stringify(exitData))
+  })
+
+  socket.on('newMessage', (data) => {
+    const messageData = JSON.parse(data)
+    console.log(`room code: ${messageData.to} / from: ${messageData.from} / ${messageData.content}`)
+    socket.broadcast.to(`${messageData.to}`).emit('update', JSON.stringify(messageData))
+  })
+
+  socket.on('disconnect', () => {
+    console.log(`socket ${socket.id} disconnected`)
+  })
+})
+
+server.listen(app.get('port'), () => {
   app.get('port');
 });
