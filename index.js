@@ -8,6 +8,7 @@ app.use(express.json());
 app.get('/', async (req, res, next) => {
   res.writeHead('200', { 'Content-Type': 'text/html;charset=utf-8' });
   console.log('서버 응답');
+  console.log('안녕');
   res.end('<h1>서버에서 응답한 결과입니다</h1>');
 });
 
@@ -91,13 +92,14 @@ app.set('port', process.env.PORT || 3000);
 const server = http.createServer(app);
 
 // http Server를 socket.io 서버로 업그레이드
+const io = require('socket.io')(server);
 io.sockets.on('connection', (socket) => {
   console.log(`socket ${socket.id} connected: `)
 
   socket.on('enter', (data) => {
     const roomData = JSON.parse(data)
-    const user_name = roomData.user_name
-    const room_code = roomData.room_code
+    const user_name = roomData.userName
+    const room_code = roomData.roomCode
 
     socket.join(`${room_code}`)
     
