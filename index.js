@@ -24,12 +24,12 @@ const arr = [];
 let i = 0;
 
 app.post('/', async (req, res, next) => {
-    const { title, code, host } = req.body;
+    const { roomTitle, roomCode, hostName } = req.body;
     const isHost = true;
-    const roomInfo = { title, code, host };
+    const roomInfo = { roomTitle, roomCode, hostName };
     room.push(roomInfo);
-  
-    console.log("room : "+room.title);
+
+    console.log("room : "+room.roomTitle);
     res.status(200).json({
       message: 'WeTube room create success!!!',
       result: room,
@@ -67,17 +67,22 @@ app.post('/user', async (req, res) => {
 });
 
 app.get('/room', async (req, res) => {
-  res.status(200).json({
-    message: 'get users data success',
-    title: room[0].title,
-    host: room[0].host,
-  });
+    try{
+        res.status(200).json({
+                message: 'get users data success',
+                roomTitle: room[0].roomTitle,
+                hostName: room[0].hostName,
+                roomCode: room[0].roomCode,
+        });
+     } catch (error){
+        console.log('방이 하나도 없음');
+     }
 });
 
 app.post('/room', async (req, res) => {
-  const { title, code, host } = req.body;
+  const { roomTitle, roomCode, hostName } = req.body;
   const isHost = true;
-  const roomInfo = { title, code, host, isHost};
+  const roomInfo = { roomTitle, roomCode, hostName, isHost};
 
   room.push(roomInfo);
 
@@ -102,12 +107,12 @@ io.sockets.on('connection', (socket) => {
     const room_code = roomData.roomCode
 
     socket.join(`${room_code}`)
-    
+
     console.log(`${user_name} entered room:${room_code}`)
-    
+
     const enterData = {
       type : "ENTER",
-      content : `${user_name}님이 입장하셨습니다.`  
+      content : `${user_name}님이 입장하셨습니다.`
     }
     socket.broadcast.to(`${room_code}`).emit('update', JSON.stringify(enterData))
   })
@@ -123,7 +128,7 @@ io.sockets.on('connection', (socket) => {
 
     const exitData = {
       type : "EXIT",
-      content : `${user_name}님이 퇴장하셨습니다.`  
+      content : `${user_name}님이 퇴장하셨습니다.`
     }
     socket.broadcast.to(`${room_code}`).emit('update', JSON.stringify(exitData))
   })
