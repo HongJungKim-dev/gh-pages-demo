@@ -28,7 +28,11 @@ app.post('/', async (req, res, next) => {
     const isHost = true;
     const roomInfo = { roomTitle, roomCode, hostName };
     room.push(roomInfo);
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> feature-get-room
     console.log("room : "+room.roomTitle);
     res.status(200).json({
       message: 'WeTube room create success!!!',
@@ -68,6 +72,7 @@ app.post('/user', async (req, res) => {
 
 app.get('/room', async (req, res) => {
     try{
+<<<<<<< HEAD
         res.status(200).json({
                 message: 'get users data success',
                 roomTitle: room[0].roomTitle,
@@ -76,6 +81,15 @@ app.get('/room', async (req, res) => {
         });
      } catch (error){
         console.log('방이 하나도 없음');
+=======
+	res.status(200).json({
+		message: 'get users data success',
+		roomSize: room.length,
+        room,
+	});
+     } catch (error){
+	console.log('방이 하나도 없음');
+>>>>>>> feature-get-room
      }
 });
 
@@ -107,20 +121,34 @@ io.sockets.on('connection', (socket) => {
     const room_code = roomData.roomCode
 
     socket.join(`${room_code}`)
+<<<<<<< HEAD
 
     console.log(`${user_name} entered room:${room_code}`)
 
     const enterData = {
       type : "ENTER",
       content : `${user_name}님이 입장하셨습니다.`
+=======
+    
+    console.log(`${user_name} entered room:${room_code}`)
+    
+    const enterData = {
+      type : "ENTER",
+      content : `${user_name}님이 입장하셨습니다.`  
+>>>>>>> feature-get-room
     }
     socket.broadcast.to(`${room_code}`).emit('update', JSON.stringify(enterData))
   })
 
   socket.on('exit', (data) => {
     const roomData = JSON.parse(data)
+<<<<<<< HEAD
     const user_name = roomData.user_name
     const room_code = roomData.room_code
+=======
+    const user_name = roomData.userName
+    const room_code = roomData.roomCode
+>>>>>>> feature-get-room
 
     socket.leave(`${room_code}`)
 
@@ -128,7 +156,11 @@ io.sockets.on('connection', (socket) => {
 
     const exitData = {
       type : "EXIT",
+<<<<<<< HEAD
       content : `${user_name}님이 퇴장하셨습니다.`
+=======
+      content : `${user_name}님이 퇴장하셨습니다.`  
+>>>>>>> feature-get-room
     }
     socket.broadcast.to(`${room_code}`).emit('update', JSON.stringify(exitData))
   })
