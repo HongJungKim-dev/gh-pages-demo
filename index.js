@@ -19,7 +19,7 @@ app.get('/read', async (req, res, next) => {
 });
 
 const users = [];
-const room = [];
+let room = [];
 const arr = [];
 let i = 0;
 
@@ -53,16 +53,50 @@ app.get('/user', async (req, res) => {
   });
 });
 
-app.post('/user', async (req, res) => {
-  const { user } = req.body;
+app.post('/media', async (req, res) => {
+  const { roomCode, videoTitle, publisher, thumbnailUrl, videoId } = req.body;
 
+  let newRoomIfon = {}
+  room.forEach((roomInfo) => {
+    if( roomInfo.roomCode == roomCode){
+        newRoomInfo = { ...roomInfo,  videoTitle, publisher, thumbnailUrl, videoId }
+    }
+  })
+
+  room = room.filter((roomInfo) => roomInfo.roomCode !== roomCode)
+  room.push(newRoomInfo)
   users.push({
     user,
   });
 
   res.status(200).json({
     message: 'post users data success',
-    result: users,
+    result: newRoomInfo.userName,
+  });
+
+
+
+});
+
+app.post('/user', async (req, res) => {
+  const { userName, roomCode } = req.body;
+
+  let newRoomIfon = {}
+  room.forEach((roomInfo) => {
+    if( roomInfo.roomCode == roomCode){
+    	newRoomInfo = { ...roomInfo, userName }
+    }
+  })
+
+  room = room.filter((roomInfo) => roomInfo.roomCode !== roomCode)
+  room.push(newRoomInfo)
+  users.push({
+    user,
+  });
+
+  res.status(200).json({
+    message: 'post users data success',
+    result: newRoomInfo.userName,
   });
 });
 
