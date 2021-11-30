@@ -122,7 +122,7 @@ app.post('/delete', async (req, res) => {//postDelete 함수 호출되면 안드
         throw error;
       }
     });
-    db.query(`DELETE FROM chat WHERE DbRoomCode = ?`, [roomCode], function (error, result3) {
+    db.query(`DELETE FROM chat WHERE Db_roomCode = ?`, [roomCode], function (error, result3) {
         if (error) {
           throw error;
         }
@@ -155,6 +155,43 @@ app.post('/delete', async (req, res) => {//postDelete 함수 호출되면 안드
 
   });
 })
+
+app.post('/videoDelete', async (req, res) => {//postVideoDelete 함수 호출되면 안드로이에서 보낸 값 받아서 
+    const { videoId, roomCode, isHost } = req.body;
+    
+    if (isHost == "true") { // 유저가 호스트일 경우는 해당 방도 삭제한다
+      db.query(`DELETE FROM roominfo WHERE Db_roomCode = ? AND Db_videoId =?`, [roomCode, videoId], function (error, result3) {
+        if (error) {
+          throw error;
+        }
+      });
+    }
+    db.query(`SELECT * from roominfo`, function (error3, result3) { // 테이블 cosole 출력으로 확인용
+      if (error3) {
+        throw error3;
+      }
+      roomResult = result3;
+      console.log(roomResult);
+  
+    });
+
+  })
+
+  app.get('/videoDelete', async (req, res) => {// getData url이 media일때 사용 
+    const { videoId, roomCode, isHost} = req.body;
+    db.query(`SELECT Db_videoId from roominfo Where Db_roomCode = ? LIMIT 1`,[roomCode], function (error2, result2) { //roominfo 테이블의 데이터 뽑아서
+      if (error2) {
+        throw error2;
+      }
+      roominfo = result2;
+      console.log(roominfo);
+    });
+    res.status(200).json({
+      message: 'get users data success',
+      roominfo,
+    });
+  });
+
 app.get('/room', async (req, res) => {//getData url room이 호출되었을때 사용된다
   try {
     db.query(`SELECT * from room`, function (error2, result2) { //room 테이블의 데이터를 다 뽑아서
@@ -343,7 +380,9 @@ io.sockets.on('connection', (socket) => {
     console.log(`host paused the video`)
     socket.broadcast.to(`${room_code}`).emit('pause', JSON.stringify(pauseData))
   })
+  
 // 방 나감 
+
   socket.on('exit', (data) => {
     const roomData = JSON.parse(data)
     const user_name = roomData.userName
